@@ -1,3 +1,7 @@
+<!--
+  This component provides a simple color mode button that allows to switch between light and dark
+  themes.
+-->
 <script setup>
   import { useColorMode } from '@vueuse/core'
 

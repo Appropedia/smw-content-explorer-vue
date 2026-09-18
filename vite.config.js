@@ -10,6 +10,9 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     ui({
+      components: {
+        dirs: [],
+      },
       ui: {
         colors: {
           primary: 'blue',

@@ -1,7 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import ColorModeButton from './components/ColorModeButton.vue'
+  import ColorModeButton from '@/components/ColorModeButton.vue'
 
   const sidebarOpen = ref(true)
 
@@ -36,7 +36,9 @@
           />
           <ColorModeButton class="ml-auto" />
         </div>
-        <RouterView />
+        <div class="h-[calc(100svh-var(--ui-header-height))] pb-3.75">
+          <RouterView />
+        </div>
       </div>
     </div>
   </UApp>
