@@ -6,7 +6,9 @@
   import { computed } from 'vue'
   import { useQuery } from '@pinia/colada'
   import { askQuery } from '@/queries/semantic-mediawiki.js'
-  import { getAllowedValues }  from '@/helpers/semantic-mediawiki.js'
+  import {
+    getAllowedValues, removePageNamePrefix, sortResults
+  }  from '@/helpers/semantic-mediawiki.js'
   import FilterButtonGroup from '@/components/FilterButtonGroup.vue'
   import PageResultTransitionGroup from '@/components/PageResultTransitionGroup.vue'
 
@@ -17,7 +19,7 @@
       {
         conditions: '[[Property:Page SDG]]',
         printouts: ['Allows value'],
-      },
+      }
     )
   )
 
@@ -26,9 +28,10 @@
     () => askQuery(
       'https://www.appropedia.org/w/api.php',
       {
-        conditions: '[[Category:Fab_lab_profile]]',
-        printouts: ['Page SDG', 'Organization area'],
-      },
+        conditions: '[[Category:Fab_lab_profile]] [[Page parent::Fab Labs SDG]]',
+        printouts: ['Page description', 'Page SDG', 'Organization area'],
+        parameters: { limit: 10000 },
+      }
     )
   )
 
@@ -45,11 +48,16 @@
       description: v.slice(v.indexOf(' ') + 1),
     }))
   })
+
+  //Sort the results in the fab lab query by page name and remove their prefixes
+  const fabLabQueryData = computed(() => {
+    return sortResults(removePageNamePrefix(fabLabQueryState.value.data, 'Fab Labs SDG/'))
+  })
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <UPageHeader title="Fablabs by Sustainable Development Goals" />
+    <UPageHeader title="Fab labs by Sustainable Development Goals" />
     <div class="min-h-0 grow flex flex-row gap-4">
       <div v-if="pageSDGQueryState.status === 'pending'" class="simple-panel">
         Loading...
@@ -58,7 +66,7 @@
         Error loading allowed values for Page SDG <br>
         {{ pageSDGQueryState.error }}
       </div>
-      <UScrollArea v-else-if="pageSDGQueryState.status === 'success'">
+      <UScrollArea v-else-if="pageSDGQueryState.status === 'success'" class="shrink-0">
         <FilterButtonGroup filter-name="Page SDG" :items="filterButtonListItems"
           legend="Sustainable Development Goals" variant="card"
         />
@@ -68,13 +76,13 @@
         Loading...
       </div>
       <div v-else-if="fabLabQueryState.status === 'error'" class="simple-panel">
-        Error loading fablab pages <br>
+        Error loading fab lab pages <br>
         {{ fabLabQueryState.error }}
       </div>
       <UScrollArea v-else-if="fabLabQueryState.status === 'success'" class="grow"
         :ui="{ viewport: 'p-px' }"
       >
-        <PageResultTransitionGroup :query-data="fabLabQueryState.data"
+        <PageResultTransitionGroup :query-data="fabLabQueryData"
           v-slot="{ pageName, pageProperties }"
         >
           <UPageCard>
@@ -83,8 +91,13 @@
                 {{ pageName }}
               </ULink>
             </template>
-            Organization area: {{ pageProperties.printouts['Organization area'][0] }}
-            <div>
+            <div v-if="pageProperties.printouts['Page description'].length > 0">
+              {{ pageProperties.printouts['Page description'][0] }}
+            </div>
+            <div v-if="pageProperties.printouts['Organization area'].length > 0">
+              Organization area: {{ pageProperties.printouts['Organization area'][0] }}
+            </div>
+            <div v-if="pageProperties.printouts['Page SDG'].length > 0">
               <ULink v-for="sdg of pageProperties.printouts['Page SDG']" :key="sdg"
                 :to="sdg.fullurl" active external target="_blank"
               >

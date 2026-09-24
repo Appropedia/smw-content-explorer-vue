@@ -8,9 +8,9 @@ const router = createRouter({
       component: {},
     },
     {
-      path: '/fablabs-sdg',
-      name: 'Fablabs by Sustainable Development Goals',
-      component: () => import('@/views/fablabs-sdg.vue'),
+      path: '/fab-labs-sdg',
+      name: 'Fab Labs by Sustainable Development Goals',
+      component: () => import('@/views/fab-labs-sdg.vue'),
     },
     {
       path: '/tissues-explorer',

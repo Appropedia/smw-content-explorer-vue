@@ -1,3 +1,5 @@
+import { sortObject } from '@/helpers/misc-helpers.js'
+
 //Obtain a clean set of allowed property values from a Semantic Mediawiki API response, in the form
 //of the following structure: { propertyName: [propertyValues] }
 export function getAllowedValues(APIResult) {
@@ -77,6 +79,39 @@ export function getPrintoutValues(APIResult) {
     Object.entries(APIResult.results)
     .map(([pageName, pageData]) => [pageName, getPrintouts(pageData)])
   )
+}
+
+//Remove the given prefix string from the names of the pages in a Semantic Mediawiki API response
+export function removePageNamePrefix(APIResult, prefix) {
+  //Return the same object but replace the original results with the modified ones
+  return {
+    ...APIResult,
+    results: Object.fromEntries(
+      Object.entries(APIResult.results).map(
+        ([pageName, pageData]) =>
+          [pageName.startsWith(prefix)? pageName.slice(prefix.length): pageName, pageData]
+      )
+    )
+  }
+}
+
+//Sort the pages in a Semantic Mediawiki API response using an optional sort function. The sort
+//function takes values 'a' and 'b' as objects in the form { pageName, pageData }.
+export function sortResults(APIResult, sortFunction) {
+  //Sort by page name if no sort function is provided
+  const doSort = sortFunction ?? ((a, b) => a.pageName.localeCompare(b.pageName))
+
+  //Return the same object but replace the original results with the sorted ones
+  return {
+    ...APIResult,
+    results: sortObject(
+      APIResult.results,
+      (a, b) => doSort(
+        { pageName: a.key, pageData: a.value },
+        { pageName: b.key, pageData: b.value }
+      )
+    ),
+  }
 }
 
 //Check whether the given printout values satisfy the applied filters by using the given merge

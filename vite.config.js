@@ -6,6 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import ui from '@nuxt/ui/vite'
 
 export default defineConfig({
+  base: '',
   plugins: [
     vue(),
     vueDevTools(),

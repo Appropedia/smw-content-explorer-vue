@@ -6,7 +6,10 @@
   import { computed } from 'vue'
   import { useQuery } from '@pinia/colada'
   import { askQuery } from '@/queries/semantic-mediawiki.js'
-  import { countPrintoutValues }  from '@/helpers/semantic-mediawiki.js'
+  import {
+    countPrintoutValues, removePageNamePrefix, sortResults
+  } from '@/helpers/semantic-mediawiki.js'
+  import { sortObject } from '@/helpers/misc-helpers.js'
   import FilterButtonGroup from '@/components/FilterButtonGroup.vue'
   import PageResultTransitionGroup from '@/components/PageResultTransitionGroup.vue'
 
@@ -17,17 +20,18 @@
       {
         conditions: '[[~TissueDB/Tissues/*]]',
         printouts: ['Page description', 'Page keywords'],
-      },
+        parameters: { limit: 10000 },
+      }
     )
   )
 
   //Populate the filter radio button group with all values of the 'Page keywords' property that are
   //present in the page data
   const radioButtonItems = computed(() => {
-    if (tissueDBQueryState.value.data === undefined)
-      return []   //Data not ready yet
-
-    const printoutCounts = countPrintoutValues(tissueDBQueryState.value.data)['Page keywords']
+    //Get the count of each page keyword, then sort the keywords by count and then by name
+    let printoutCounts = countPrintoutValues(tissueDBQueryState.value.data)['Page keywords']
+    printoutCounts = sortObject(printoutCounts)
+    printoutCounts = sortObject(printoutCounts, (a, b) => b.value - a.value)
 
     return Object.entries(printoutCounts).map(([propertyValue, valueCount]) =>
       ({
@@ -35,6 +39,11 @@
         value: propertyValue,
       })
     )
+  })
+
+  //Sort the results in the query by page name and remove their prefixes
+  const tissueDBQueryData = computed(() => {
+    return sortResults(removePageNamePrefix(tissueDBQueryState.value.data, 'TissueDB/Tissues/'))
   })
 </script>
 
@@ -57,7 +66,7 @@
         />
       </UScrollArea>
       <UScrollArea class="grow" :ui="{ viewport: 'p-px' }">
-        <PageResultTransitionGroup :query-data="tissueDBQueryState.data"
+        <PageResultTransitionGroup :query-data="tissueDBQueryData"
           :merge-rules="{ 'Page keywords': 'disjunction' }"
         >
           <template #when-empty>Select a keyword</template>
@@ -68,10 +77,12 @@
                   {{ pageName }}
                 </ULink>
               </template>
-              <div> {{ pageProperties.printouts['Page description'][0] }} </div>
-              <div>
+              <div v-if="pageProperties.printouts['Page description'].length > 0">
+                {{ pageProperties.printouts['Page description'][0] }}
+              </div>
+              <div v-if="pageProperties.printouts['Page keywords'].length > 0">
                 Keywords:
-                <i>{{ pageProperties.printouts['Page keywords'].join(', ') }}</i>
+                <i class="font-light">{{ pageProperties.printouts['Page keywords'].join(', ') }}</i>
               </div>
             </UPageCard>
           </template>
