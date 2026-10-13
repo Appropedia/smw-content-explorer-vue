@@ -10,8 +10,11 @@
   import { useResultFiltersStore } from '@/stores/result-filters.js'
 
   const props = defineProps({
-    filterName: String,   //Filter identifier (SMW property name)
-    buttonType: {         //The button type ('checkbox' or 'radio')
+    filterName: {   //Filter identifier (SMW property name)
+      type: String,
+      required: true,
+    },
+    buttonType: {   //The button type ('checkbox' or 'radio')
       type: String,
       default: 'checkbox',
     },

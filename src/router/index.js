@@ -1,3 +1,4 @@
+import { h } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
@@ -5,7 +6,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: {},
+      component: { render: () => h('div', 'Select an exploration topic') },
     },
     {
       path: '/fab-labs-sdg',

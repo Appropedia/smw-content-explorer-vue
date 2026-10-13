@@ -10,8 +10,8 @@
     countPrintoutValues, removePageNamePrefix, sortResults
   } from '@/helpers/semantic-mediawiki.js'
   import { sortObject } from '@/helpers/misc-helpers.js'
+  import { useFilteredPages } from '@/composables/useFilteredPages.js'
   import FilterButtonGroup from '@/components/FilterButtonGroup.vue'
-  import PageResultTransitionGroup from '@/components/PageResultTransitionGroup.vue'
 
   //Query used for obtaining all page data
   const { state: tissueDBQueryState } = useQuery(
@@ -45,6 +45,9 @@
   const tissueDBQueryData = computed(() => {
     return sortResults(removePageNamePrefix(tissueDBQueryState.value.data, 'TissueDB/Tissues/'))
   })
+
+  //Create a reactive list of filtered pages from the query data
+  const filteredPages = useFilteredPages(tissueDBQueryData, { 'Page keywords': 'disjunction' })
 </script>
 
 <template>
@@ -66,11 +69,9 @@
         />
       </UScrollArea>
       <UScrollArea class="grow" :ui="{ viewport: 'p-px' }">
-        <PageResultTransitionGroup :query-data="tissueDBQueryData"
-          :merge-rules="{ 'Page keywords': 'disjunction' }"
-        >
-          <template #when-empty>Select a keyword</template>
-          <template #default="{ pageName, pageProperties }">
+        <template v-if="Object.keys(filteredPages).length === 0">Select a keyword</template>
+        <TransitionGroup v-else tag="div" class="flex flex-col gap-2">
+          <div v-for="{ pageName, pageProperties } in filteredPages" :key="pageName">
             <UPageCard>
               <template #title>
                 <ULink :to="pageProperties.fullurl" active external target="_blank">
@@ -85,9 +86,26 @@
                 <i class="font-light">{{ pageProperties.printouts['Page keywords'].join(', ') }}</i>
               </div>
             </UPageCard>
-          </template>
-        </PageResultTransitionGroup>
+          </div>
+        </TransitionGroup>
       </UScrollArea>
     </div>
   </div>
 </template>
+
+<style scoped>
+  .v-move,
+  .v-enter-active,
+  .v-leave-active {
+    transition: all 0.5s ease;
+  }
+
+  .v-enter-from,
+  .v-leave-to {
+    opacity: 0;
+  }
+
+  .v-leave-active {
+    position: absolute;
+  }
+</style>

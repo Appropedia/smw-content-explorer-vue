@@ -9,8 +9,8 @@
   import {
     getAllowedValues, removePageNamePrefix, sortResults
   }  from '@/helpers/semantic-mediawiki.js'
+  import { useFilteredPages } from '@/composables/useFilteredPages.js'
   import FilterButtonGroup from '@/components/FilterButtonGroup.vue'
-  import PageResultTransitionGroup from '@/components/PageResultTransitionGroup.vue'
 
   //Query used for populating the filter list
   const { state: pageSDGQueryState } = useQuery(
@@ -53,6 +53,9 @@
   const fabLabQueryData = computed(() => {
     return sortResults(removePageNamePrefix(fabLabQueryState.value.data, 'Fab Labs SDG/'))
   })
+
+  //Create a reactive list of filtered pages from the query data
+  const filteredPages = useFilteredPages(fabLabQueryData)
 </script>
 
 <template>
@@ -81,31 +84,30 @@
       </div>
       <UScrollArea v-else-if="fabLabQueryState.status === 'success'" class="grow"
         :ui="{ viewport: 'p-px' }"
+        :items="filteredPages"
+        v-slot="{ item: { pageName, pageProperties } }"
+        virtualize
       >
-        <PageResultTransitionGroup :query-data="fabLabQueryData"
-          v-slot="{ pageName, pageProperties }"
-        >
-          <UPageCard>
-            <template #title>
-              <ULink :to="pageProperties.fullurl" active external target="_blank">
-                {{ pageName }}
-              </ULink>
-            </template>
-            <div v-if="pageProperties.printouts['Page description'].length > 0">
-              {{ pageProperties.printouts['Page description'][0] }}
-            </div>
-            <div v-if="pageProperties.printouts['Organization area'].length > 0">
-              Organization area: {{ pageProperties.printouts['Organization area'][0] }}
-            </div>
-            <div v-if="pageProperties.printouts['Page SDG'].length > 0">
-              <ULink v-for="sdg of pageProperties.printouts['Page SDG']" :key="sdg"
-                :to="sdg.fullurl" active external target="_blank"
-              >
-                {{ sdg.fulltext.split(' ')[0] }} {{ ' ' }}
-              </ULink>
-            </div>
-          </UPageCard>
-        </PageResultTransitionGroup>
+        <UPageCard>
+          <template #title>
+            <ULink :to="pageProperties.fullurl" active external target="_blank">
+              {{ pageName }}
+            </ULink>
+          </template>
+          <div v-if="pageProperties.printouts['Page description'].length > 0">
+            {{ pageProperties.printouts['Page description'][0] }}
+          </div>
+          <div v-if="pageProperties.printouts['Organization area'].length > 0">
+            Organization area: {{ pageProperties.printouts['Organization area'][0] }}
+          </div>
+          <div v-if="pageProperties.printouts['Page SDG'].length > 0">
+            <ULink v-for="sdg of pageProperties.printouts['Page SDG']" :key="sdg"
+              :to="sdg.fullurl" active external target="_blank"
+            >
+              {{ sdg.fulltext.split(' ')[0] }} {{ ' ' }}
+            </ULink>
+          </div>
+        </UPageCard>
       </UScrollArea>
     </div>
   </div>
