@@ -28,7 +28,9 @@
     () => askQuery(
       'https://www.appropedia.org/w/api.php',
       {
-        conditions: '[[Category:Fab_lab_profile]] [[Page parent::Fab Labs SDG]]',
+        conditions: '[[Category:Fab Labs SDG]] ' +    //Base category
+                    '[[Organization type::+]] ' +     //Only pages that describe an organization
+                    '[[Page parent::Fab Labs SDG]]',  //Exclude child pages (translations)
         printouts: ['Page description', 'Page SDG', 'Organization area'],
         parameters: { limit: 10000 },
       }
@@ -62,31 +64,24 @@
   <div class="flex flex-col h-full">
     <UPageHeader title="Fab labs by Sustainable Development Goals" />
     <div class="min-h-0 grow flex flex-row gap-4">
-      <div v-if="pageSDGQueryState.status === 'pending'" class="simple-panel">
-        Loading...
-      </div>
-      <div v-else-if="pageSDGQueryState.status === 'error'" class="simple-panel">
-        Error loading allowed values for Page SDG <br>
-        {{ pageSDGQueryState.error }}
-      </div>
+      <UEmpty v-if="pageSDGQueryState.status === 'pending'" loading title="Loading" />
+      <UEmpty v-else-if="pageSDGQueryState.status === 'error'" icon="i-lucide-circle-x"
+        title="Error loading allowed values for Page SDG" :description="pageSDGQueryState.error"
+      />
       <UScrollArea v-else-if="pageSDGQueryState.status === 'success'" class="shrink-0">
         <FilterButtonGroup filter-name="Page SDG" :items="filterButtonListItems"
           legend="Sustainable Development Goals" variant="card"
         />
       </UScrollArea>
 
-      <div v-if="fabLabQueryState.status === 'pending'" class="simple-panel">
-        Loading...
-      </div>
-      <div v-else-if="fabLabQueryState.status === 'error'" class="simple-panel">
-        Error loading fab lab pages <br>
-        {{ fabLabQueryState.error }}
-      </div>
-      <UScrollArea v-else-if="fabLabQueryState.status === 'success'" class="grow"
-        :ui="{ viewport: 'p-px' }"
+      <UEmpty v-if="fabLabQueryState.status === 'pending'" loading title="Loading" class="grow" />
+      <UEmpty v-else-if="fabLabQueryState.status === 'error'" icon="i-lucide-circle-x" class="grow"
+        title="Error loading fab lab pages" :description="fabLabQueryState.error"
+      />
+      <UScrollArea v-else-if="fabLabQueryState.status === 'success'" class="grow p-px"
         :items="filteredPages"
         v-slot="{ item: { pageName, pageProperties } }"
-        virtualize
+        :virtualize="{ gap: 6, estimateSize: 240 }"
       >
         <UPageCard>
           <template #title>
@@ -112,12 +107,3 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-  @reference "tailwindcss";
-
-  .simple-panel {
-    @apply grow border rounded-md p-2;
-    border-color: var(--ui-border);
-  }
-</style>

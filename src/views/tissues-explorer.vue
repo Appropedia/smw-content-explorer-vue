@@ -53,13 +53,10 @@
 <template>
   <div class="flex flex-col h-full">
     <UPageHeader title="Tissues Explorer" />
-    <div v-if="tissueDBQueryState.status === 'pending'">
-      Loading...
-    </div>
-    <div v-else-if="tissueDBQueryState.status === 'error'">
-      Error loading allowed values for Page SDG <br>
-      {{ tissueDBQueryState.error }}
-    </div>
+    <UEmpty v-if="tissueDBQueryState.status === 'pending'" loading title="Loading" class="grow" />
+    <UEmpty v-else-if="tissueDBQueryState.status === 'error'" icon="i-lucide-circle-x" class="grow"
+      title="Error loading tissue DB pages" :description="tissueDBQueryState.error"
+    />
     <div v-else-if="tissueDBQueryState.status === 'success'"
       class="min-h-0 grow flex flex-row gap-4"
     >

@@ -36,7 +36,7 @@
           />
           <ColorModeButton class="ml-auto" />
         </div>
-        <div class="h-[calc(100svh-var(--ui-header-height))] pb-3.75">
+        <div class="h-[calc(100svh-var(--ui-header-height))] pb-3.75 pr-4">
           <RouterView />
         </div>
       </div>
