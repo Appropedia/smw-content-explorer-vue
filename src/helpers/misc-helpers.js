@@ -11,3 +11,28 @@ export function sortObject(obj, sortFunction) {
     )
   )
 }
+
+//Given two objects that contain JSON data exclusively, merge the source into the destination by
+//recursively merging or overwriting fields.
+export function appendJSONObject(dst, src) {
+  //Iterate over the key/value pairs of the source JSON object
+  for (const [k, v] of Object.entries(src)) {
+    if (typeof v === 'object') {
+      //Composite values are merged
+      if (Array.isArray(v)) {
+        //Arrays are extended
+        dst[k] ??= []
+        dst[k].push(...v)
+      }
+      else {
+        //Child objects are appended recursively
+        dst[k] ??= {}
+        appendJSONObject(dst[k], v)
+      }
+    }
+    else {
+      //Single values are appended or overwritten
+      dst[k] = v
+    }
+  }
+}

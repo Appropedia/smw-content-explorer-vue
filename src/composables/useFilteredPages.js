@@ -7,7 +7,7 @@ const resultFilters = useResultFiltersStore()
 
 //Given a reactive variable with the contents of a Semantic Mediawiki API response, get a reactive
 //list of filtered pages by applying the filters from the store, in the form of the following
-//structure: [ { pageNamme, pageProperties } ]
+//structure: [ { pageName, pageProperties } ]
 //Note: Merge rules apply to the filtering process; see the checkFilters function for details
 export function useFilteredPages(queryData, mergeRules) {
   //All printout values are derived (and cached) from the API response directly

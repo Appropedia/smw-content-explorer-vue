@@ -18,6 +18,11 @@ const router = createRouter({
       name: 'Tissues Explorer',
       component: () => import('@/views/tissues-explorer.vue'),
     },
+    {
+      path: '/careables-collection',
+      name: 'Careables Collection',
+      component: () => import('@/views/careables-collection.vue'),
+    },
   ],
 })
 

@@ -5,7 +5,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useQuery } from '@pinia/colada'
-  import { askQuery } from '@/queries/semantic-mediawiki.js'
+  import { askActionQuery } from '@/queries/semantic-mediawiki.js'
   import {
     countPrintoutValues, removePageNamePrefix, sortResults
   } from '@/helpers/semantic-mediawiki.js'
@@ -15,7 +15,7 @@
 
   //Query used for obtaining all page data
   const { state: tissueDBQueryState } = useQuery(
-    () => askQuery(
+    () => askActionQuery(
       'https://www.appropedia.org/w/api.php',
       {
         conditions: '[[~TissueDB/Tissues/*]]',

@@ -9,7 +9,7 @@ export function getAllowedValues(APIResult) {
   }
 
   //Make sure the response API response contains allowed values
-  if (!APIResult.printRequests.some(pr => pr.label === 'Allows value' && pr.typeid === '__pval')) {
+  if (!APIResult.printrequests.some(pr => pr.label === 'Allows value' && pr.typeid === '__pval')) {
     throw new Error('API result does not contain allowed values')
   }
 
@@ -47,7 +47,7 @@ export function countPrintoutValues(APIResult) {
 export function getPrintoutValues(APIResult) {
   //Get the types of the properties as a simple object
   const typeIDs = Object.fromEntries(
-    APIResult.printRequests.map(pr => [pr.label, pr.typeid])
+    APIResult.printrequests.map(pr => [pr.label, pr.typeid])
   )
 
   //Extract printout values from a page data structure

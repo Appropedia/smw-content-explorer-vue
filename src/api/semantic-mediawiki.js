@@ -1,7 +1,9 @@
+import { appendJSONObject } from '@/helpers/misc-helpers.js'
+
 //Request pages from the wiki based on the provided semantic search parameters
-export async function askRequest(baseAPIUrl, queryDescriptor) {
+export async function askActionRequest(baseApiUrl, queryDescriptor) {
   //Create a new URL with the query parameters
-  const url = new URL(baseAPIUrl)
+  const url = new URL(baseApiUrl)
   url.search = new URLSearchParams({
     action: 'ask',
     query: formatQuery(queryDescriptor),
@@ -11,7 +13,7 @@ export async function askRequest(baseAPIUrl, queryDescriptor) {
 
   //Perform paginated requests until all results are retrieved
   let fragment
-  const results = {}
+  const queryResult = {}
   do {
     //Obtain the query continue offset parameter from last request, if available
     const offset = fragment?.['query-continue-offset']
@@ -31,13 +33,10 @@ export async function askRequest(baseAPIUrl, queryDescriptor) {
     fragment = await response.json()
 
     //Accumulate the results
-    Object.assign(results, fragment.query.results)
+    appendJSONObject(queryResult, fragment.query)
   } while (Object.hasOwn(fragment, 'query-continue-offset'))
 
-  //Take the print request metadata from the last request (every fragment has the same data)
-  const printRequests = fragment.query.printrequests
-
-  return { results, printRequests }
+  return queryResult
 }
 
 //Format an "ask" query string and optionally add or replace parameters

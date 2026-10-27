@@ -1,7 +1,7 @@
 import { defineQueryOptions } from '@pinia/colada'
-import { askRequest } from '@/api/semantic-mediawiki.js'
+import { askActionRequest } from '@/api/semantic-mediawiki.js'
 
-export const askQuery = defineQueryOptions((baseAPIUrl, queryDescriptor) => ({
-  key: ['semantic-mediawiki', baseAPIUrl, queryDescriptor],
-  query: () => askRequest(baseAPIUrl, queryDescriptor),
+export const askActionQuery = defineQueryOptions((baseApiUrl, queryDescriptor) => ({
+  key: ['semantic-mediawiki', baseApiUrl, queryDescriptor],
+  query: () => askActionRequest(baseApiUrl, queryDescriptor),
 }))

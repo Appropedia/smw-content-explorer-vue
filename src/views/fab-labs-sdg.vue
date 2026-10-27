@@ -5,7 +5,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useQuery } from '@pinia/colada'
-  import { askQuery } from '@/queries/semantic-mediawiki.js'
+  import { askActionQuery } from '@/queries/semantic-mediawiki.js'
   import {
     getAllowedValues, removePageNamePrefix, sortResults
   }  from '@/helpers/semantic-mediawiki.js'
@@ -14,7 +14,7 @@
 
   //Query used for populating the filter list
   const { state: pageSDGQueryState } = useQuery(
-    () => askQuery(
+    () => askActionQuery(
       'https://www.appropedia.org/w/api.php',
       {
         conditions: '[[Property:Page SDG]]',
@@ -25,7 +25,7 @@
 
   //Query used for populating the page results
   const { state: fabLabQueryState } = useQuery(
-    () => askQuery(
+    () => askActionQuery(
       'https://www.appropedia.org/w/api.php',
       {
         conditions: '[[Category:Fab Labs SDG]] ' +    //Base category
