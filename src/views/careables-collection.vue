@@ -10,7 +10,8 @@
     () => askActionQuery(
       'https://www.appropedia.org/w/api.php',
       {
-        conditions: '[[~EDDIY/*]]',
+        conditions: '[[~EDDIY/*]] ' +           //Base page
+                    '[[Page parent::EDDIY]]',   //Exclude child pages (translations and subobjects)
         printouts: ['Page description', 'Page keywords'],
         parameters: { limit: 10000 },
       }
