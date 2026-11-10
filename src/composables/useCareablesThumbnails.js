@@ -4,6 +4,7 @@ import { queryActionQuery } from '@/queries/mediawiki.js'
 import { queryActionRequest } from '@/api/mediawiki.js'
 
 const baseApiUrl = 'https://www.appropedia.org/w/api.php'   //Base URL for the wiki API
+const parentPage = 'EDDIY/'                                 //Path of the parent page
 const fallbackImage = 'File:EDDIY.png'                      //Image to be used as a fallback
 const nonCandidateImages = [                                //Images to discard as candidates
   'File:EDDIY.png',
@@ -15,7 +16,7 @@ export function useCareablesThumbnails() {
   //Main query parameters
   const pageInfoRequestParams = {
     generator: 'allpages',                //Use the 'all pages' list as a generator
-    gapprefix: 'EDDIY/',                  //Request all sub pages under 'EDDIY/'
+    gapprefix: parentPage,                //Request all sub pages under the parent page
     gaplimit: 100,                        //Limit for the generator
     prop: 'pageimages|images|templates',  //Get PageImages data and embedded images and templates
     pithumbsize: 330,                     //Thumbnail size for PageImages
@@ -100,7 +101,7 @@ function categorizePageThumbnails(pageInfo) {
 
     //Thumbnails provided by the PageImages extension are preferred over any other option
     if (Object.hasOwn(page, 'thumbnail')) {
-      pageImageThumbnails[page.title] = page.thumbnail.source
+      pageImageThumbnails[page.title.slice(parentPage.length)] = page.thumbnail.source
       continue
     }
 
@@ -161,7 +162,7 @@ function requestWikiImageThumbnails(wikiImageThumbnails, wikiImagePages) {
     wikiImageThumbnails.value = {}
     for (const image of Object.values(imageInfo.pages)) {
       for (const pageTitle of wikiImagePages[image.title]) {
-        wikiImageThumbnails.value[pageTitle] = image.imageinfo[0].thumburl
+        wikiImageThumbnails.value[pageTitle.slice(parentPage.length)] = image.imageinfo[0].thumburl
       }
     }
   })
@@ -229,7 +230,8 @@ function requestEmbeddedVideoThumbnails(embeddedVideoThumbnails, embeddedVideoPa
       }
 
       //Use the video ID to infer the thumbnail URL and add it to the reactive variable
-      embeddedVideoThumbnails.value[page.title] = `https://i.ytimg.com/vi/${videoID}/mqdefault.jpg`
+      embeddedVideoThumbnails.value[page.title.slice(parentPage.length)] =
+        `https://i.ytimg.com/vi/${videoID}/mqdefault.jpg`
     }
   })
   .catch((error) => {

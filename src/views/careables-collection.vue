@@ -20,7 +20,7 @@
 
   //Sort the results in the query by page name and remove their prefixes
   const EDDIYQueryData = computed(() => {
-    return sortResults(removePageNamePrefix(EDDIYQueryState.value.data, ''))
+    return sortResults(removePageNamePrefix(EDDIYQueryState.value.data, 'EDDIY/'))
   })
 
   //Obtain the thumbnails of all pages in this view
