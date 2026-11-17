@@ -5,11 +5,9 @@ export async function queryActionRequest(baseApiUrl, requestParameters) {
   //Create a new URL with the query parameters
   const url = new URL(baseApiUrl)
   url.search = new URLSearchParams({
-    ...{
-      action: 'query',
-      format: 'json',
-      origin: '*',
-    },
+    action: 'query',
+    format: 'json',
+    origin: '*',
     ...requestParameters,
   })
 
